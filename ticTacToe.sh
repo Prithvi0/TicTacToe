@@ -37,3 +37,18 @@ elif [[ $toss -eq $computer ]]
 then
 	tossWon="computer"
 fi
+
+# FUNCTION TO DISPLAY THE BOARD
+function board () {
+	for element in {0..8}
+	do
+		if [[ $((element%3)) -eq 0 && $element -le 3 ]]
+		then
+			printf "_${defaultBoard[$element]}_|_${defaultBoard[$((element+1))]}_|_${defaultBoard[$((element+2))]}_\n"
+		elif [[ $((element%6)) -eq 0 && $element -le 9 ]]
+		then
+			printf " ${defaultBoard[$element]} | ${defaultBoard[$((element+1))]} | ${defaultBoard[$((element+2))]} \n"
+		fi
+	done
+}
+board
