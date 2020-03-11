@@ -6,6 +6,8 @@ declare -a defaultBoard
 # CONSTANTS
 letter1=0
 letter2=1
+player=0
+computer=1
 
 # FUNCTION TO RESET THE BOARD
 function boardReset () {
@@ -26,3 +28,12 @@ then
 	playerLetter="O"
 fi
 
+# CONDITION FOR A TOSS TO CHECK WHO PLAYS FIRST
+toss=$((RANDOM%2))
+if [[ $toss -eq $player ]]
+then
+	tossWon="player"
+elif [[ $toss -eq $computer ]]
+then
+	tossWon="computer"
+fi
