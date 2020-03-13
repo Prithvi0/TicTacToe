@@ -1,45 +1,41 @@
 #!/bin/bash -x
-echo "Welcome to TicTacToe"
+printf "Welcome to TicTacToe\n"
 # ARRAY DECLARATION
 declare -a defaultBoard
-
-# CONSTANTS
-letter1=0
-letter2=1
-player=0
-computer=1
 
 # FUNCTION TO RESET THE BOARD
 function boardReset () {
 	for((element=0;element<=8;element++ ))
 	do
-		defaultBoard[$element]=" "
+		defaultBoard[$element]=" "	# TAKING EVERY CELL AS AN EMPTY SPACE
 	done
 }
-boardReset	# CALLING THE FUNCTION
 
 # CONDITION TO ASSIGN A LETTER TO PLAYER
-letterAssign=$((RANDOM%2))
-if [[ $letterAssign -eq $letter1 ]]
-then
-	playerLetter="X"
-elif [[ $letterAssign -eq $letter2 ]]
-then
-	playerLetter="O"
-fi
+function assignLetter () {
+	letterAssign=$((RANDOM%2))
+	if [[ $letterAssign -eq 0 ]]
+	then
+		playerLetter="X"
+	else
+		playerLetter="O"
+	fi
+	printf "Your assigned letter is $playerLetter\n"
+}
 
 # CONDITION FOR A TOSS TO CHECK WHO PLAYS FIRST
+function gameToss () {
 toss=$((RANDOM%2))
-if [[ $toss -eq $player ]]
+if [[ $toss -eq 0 ]]
 then
-	tossWon="player"
-elif [[ $toss -eq $computer ]]
-then
-	tossWon="computer"
+	printf "You won the toss. Its your turn\n"
+else
+	printf "You lost the toss\n"
 fi
+}
 
 # FUNCTION TO DISPLAY THE BOARD
-function board () {
+function displayBoard () {
 	for element in {0..8}
 	do
 		if [[ $((element%3)) -eq 0 && $element -le 3 ]]
@@ -51,4 +47,8 @@ function board () {
 		fi
 	done
 }
-board
+# CALLING THE FUNCTIONS
+boardReset
+assignLetter
+gameToss
+displayBoard
