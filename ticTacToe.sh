@@ -1,5 +1,5 @@
 #!/bin/bash -x
-printf "Welcome to TicTacToe\n"
+printf "Welcomee to TicTacToe\n"
 # ARRAY DECLARATION
 declare -a defaultBoard
 
@@ -24,8 +24,7 @@ function assignLetterAndToss () {
 	if [[ $letterAssign -eq "$CROSS" ]]
 	then
 		read -p "You won the Toss. Please choose your letter (X/O): " chooseLetter
-#		playerToss="win"
-		nextPlayer=1
+		nextTurn="true"
 		if [[ $chooseLetter == "X" || $chooseLetter == "x" ]]
 		then
 			playerLetter="X"
@@ -42,9 +41,8 @@ function assignLetterAndToss () {
 		fi
 	elif [[ $letterAssign -eq "$CIRCLE" ]]
 	then
-		nextPlayer=1
+		nextTurn="false"
 		printf "You lost the toss\n"
-#		playerToss="lose"
 		playerLetter="O"
 		computerLetter="X"
 		printf "Your assigned letter is $playerLetter\n"
@@ -99,48 +97,48 @@ function boardColumn () {
 
 # FUNCTION TO CHECK FOR DIAGONAL MATCH
 function boardDiagonal () {
-		diagonal1=${defaultBoard[0]}${defaultBoard[4]}${defaultBoard[8]}
-		diagonal2=${defaultBoard[2]}${defaultBoard[4]}${defaultBoard[6]}
-		if [[ $diagonal1 == $1$1$1 || $diagonal2 == $1$1$1 ]]
-		then
-			diagonalCell="true"
-		else
-			diagonalCell="false"
-		fi
-		printf "$diagonalCell\n"
+	diagonal1=${defaultBoard[0]}${defaultBoard[4]}${defaultBoard[8]}
+	diagonal2=${defaultBoard[2]}${defaultBoard[4]}${defaultBoard[6]}
+	if [[ $diagonal1 == $1$1$1 || $diagonal2 == $1$1$1 ]]
+	then
+		diagonalCell="true"
+	else
+		diagonalCell="false"
+	fi
+	printf "$diagonalCell\n"
 }
 
 # FUNCTION TO CHECK WIN CONDITION
 function checkWin()
 {
-	checkBoardRow=$(boardRow)
-	checkBoardColumn=$(boardColumn)
-	checkBoardDiagonal=$(boardDiagonal)
+	checkBoardRow=$(boardRow $1)
+	checkBoardColumn=$(boardColumn $1)
+	checkBoardDiagonal=$(boardDiagonal $1)
 }
-checkWin
 
 function playerVsComputer()
 {
 	while [[ $count -le 8 ]]
 	do
-		if [[ $nextPlayer -eq 1 ]]
+		if [[ $nextTurn -eq "true" ]]
 		then
-			read -p "Enter Cell Number" cellPosition
+			read -p "Enter Cell position number: " cellPosition
 			positionSelect $playerLetter $cellPosition
-			nextPlayer=0
+			nextTurn="false"
 		fi
-		if [[ $nextPlayer -eq 0 ]]
+		if [[ $nextTurn -eq "false" ]]
 		then
-			computerTurn=$(($RANDOM%9))
-			positionSelect $computerLetter $computerTurn
-			nextPlayer=1
+			computerPosition=$(($RANDOM%9))
+			positionSelect $computerLetter $computerPosition
+			nextTurn="true"
 		fi
 	done
 }
 
 function positionSelect () {
 	local playerPosition="false"
-	read -p "Enter cell position Number: " cellPosition
+	letter=$1
+	cellPosition=$2
 	if [[ ${defaultBoard[$cellPosition]} == "X" || ${defaultBoard[$cellPosition]} == "O" ]]
 	then
 		printf "Enter another position\n"
@@ -152,13 +150,15 @@ function positionSelect () {
 
 	if [[ $playerPosition -eq "true" ]]
 	then
-		defaultBoard[$cellPosition]=$playerLetter
+		defaultBoard[$cellPosition]=$letter
 		count=$(($count+1))
 		displayBoard
-		checkWin $playerLetter
+		checkWin $letter
 		if [[ $checkBoardRow == "true" || $checkBoardColumn == "true" || $checkBoardDiagonal == "true" ]]
 		then
-			playResult="You Win"
+			playResult="Win"
+			printf "win\n"
+			exit
 		else
 			playResult="false"
 		fi
@@ -166,8 +166,11 @@ function positionSelect () {
 		if [[ $playerPosition == "false" ]]
 		then
 			playResult="draw"
+			printf "draw\n"
+			exit
 		else
 			playResult="change turn"
+			printf "change turn\n"
 		fi
 	fi
 }
@@ -175,6 +178,5 @@ function positionSelect () {
 # CALLING THE FUNCTIONS
 boardReset
 assignLetterAndToss
-displayBoard
 positionSelect
 playerVsComputer
