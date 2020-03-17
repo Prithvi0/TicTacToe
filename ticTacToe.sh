@@ -86,7 +86,6 @@ function displayBoard () {
 # FUNCTION TO CHECK FOR ROW, COLUMN AND DIAGONAL MATCH
 function boardRowColumnDiagonal () {
 	column=0
-	diagonal=0
 	for((row=0;row<=8;row=$((row+3)) ))
 	do
 		rowCheck=${defaultBoard[$row]}${defaultBoard[$((row+1))]}${defaultBoard[$((row+2))]}
@@ -96,9 +95,81 @@ function boardRowColumnDiagonal () {
 		if [[ $rowCheck == $1$1$1 || $columnCheck == $1$1$1 || $diagonalCheck1 == $1$1$1 || $diagonalCheck2 == $1$1$1 ]]
 		then
 			result="win"
+		else
+			result="draw"
+   	fi
+		((column++))
+	done
+}
+
+# FUNCTION FOR ROW BLOCK
+function rowBlock () {
+	row1=${defaultBoard[$row]}${defaultBoard[$((row+1))]}
+	row2=${defaultBoard[$row]}${defaultBoard[$((row+2))]}
+	row3=${defaultBoard[$((row+1))]}${defaultBoard[$((row+2))]}
+	for((row=0;row<=8;row=$((row+3)) ))
+   do
+		if [[ $row1 == $1$1 ]]
+		then
+			defaultBoard[$((row+2))]=$computerLetter
+		elif [[ $row2 == $1$1 ]]
+		then
+			defaultBoard[$((row+1))]=$computerLetter
+		elif [[ $row3 == $1$1 ]]
+		then
+			defaultBoard[$row]=$computerLetter
+		fi
+	done
+}
+
+# FUNCTION FOR COLUMN BLOCK
+function columnBlock () {
+	col1=${defaultBoard[$column]}${defaultBoard[$((column+3))]}
+	col2=${defaultBoard[$column]}${defaultBoard[$((column+6))]}
+	col3=${defaultBoard[$((column+3))]}${defaultBoard[$((column+6))]}
+	for((column=0;column<3;column++))
+	do
+		if [[ $col1 == $1$1 ]]
+		then
+			defaultBoard[$((column+6))]=$computerLetter
+		elif [[ $col2 == $1$1 ]]
+		then
+			defaultBoard[$((column+3))]=$computerLetter
+		elif [[ $col3 == $1$1 ]]
+		then
+			defaultBoard[$column]=$computerLetter
 		fi
 		((column++))
 	done
+}
+
+# FUNCTION FOR DIAGONAL BLOCK
+function diagonalBlock () {
+	dig1=${defaultBoard[0]}${defaultBoard[4]}
+	dig2=${defaultBoard[0]}${defaultBoard[8]}
+	dig3=${defaultBoard[4]}${defaultBoard[8]}
+	dig4=${defaultBoard[2]}${defaultBoard[4]}
+	dig5=${defaultBoard[2]}${defaultBoard[6]}
+	dig6=${defaultBoard[4]}${defaultBoard[6]}
+	if [[ $dig1 == $playerLetter$playerLetter || $dig1 == $computerLetter$computerLetter ]]
+	then
+		defaultBoard[8]=$computerLetter
+	elif [[ $dig2 == $playerLetter$playerLetter || $dig2 == $computerLetter$computerLetter ]]
+	then
+		defaultBoard[4]=$computerLetter
+	elif [[ $dig3 == $playerLetter$playerLetter || $dig3 == $computerLetter$computerLetter ]]
+	then
+		defaultBoard[0]=$computerLetter
+	elif [[ $dig4 == $playerLetter$playerLetter || $dig4 == $computerLetter$computerLetter ]]
+	then
+		defaultBoard[6]=$computerLetter
+	elif [[ $dig5 == $playerLetter$playerLetter || $dig5 == $computerLetter$computerLetter ]]
+	then
+		defaultBoard[4]=$computerLetter
+	elif [[ $dig6 == $playerLetter$playerLetter || $dig6 == $computerLetter$computerLetter ]]
+	then
+		defaultBoard[2]=$computerLetter
+	fi
 }
 
 # FUNCTION FOR PLAYER TO PLAY WHEN WON THE TOSS AND AFTER COMPUTER'S TURN
@@ -110,18 +181,25 @@ function playerPlay () {
 	then
 		printf "player win\n"
 		exit
+	else
+		printf "draw\n"
 	fi
 }
 
 # FUNCTION FOR COMPUTER TO PLAY WHEN WON THE TOSS AND AFTER PLAYER'S TURN
 function computerPlay () {
 	computerPosition=$(($RANDOM%9))
+	rowBlock $playerLetter $computerLetter
+	columnBlock $playerLetter $computerLetter
+	diagonalBlock $playerLetter $computerLetter
 	positionSelect $computerLetter $computerPosition
 	nextTurn="true"
 	if [[ $result == "win" ]]
 	then
 		printf "computer win\n"
 		exit
+	else
+		printf "draw\n"
 	fi
 }
 
@@ -163,14 +241,9 @@ function positionSelect () {
 
 		if [[ $playerPosition == "false" ]]
 		then
-			result="draw"
 			printf "draw\n"
-			exit
 		else
-			if [[ $result -eq "win" || $result -eq "draw" ]]
-			then
-				printf "change turn\n"
-			fi
+			printf "change turn\n"
 		fi
 	fi
 }
