@@ -101,35 +101,42 @@ function boardRowColumnDiagonal () {
 	done
 }
 
+# FUNCTION FOR PLAYER TO PLAY WHEN WON THE TOSS AND AFTER COMPUTER'S TURN
+function playerPlay () {
+	read -p "Enter Cell position number: " cellPosition
+	positionSelect $playerLetter $cellPosition
+	nextTurn="false"
+	if [[ $result == "win" ]]
+	then
+		printf "player win\n"
+		exit
+	fi
+}
+
+# FUNCTION FOR COMPUTER TO PLAY WHEN WON THE TOSS AND AFTER PLAYER'S TURN
+function computerPlay () {
+	computerPosition=$(($RANDOM%9))
+	positionSelect $computerLetter $computerPosition
+	nextTurn="true"
+	if [[ $result == "win" ]]
+	then
+		printf "computer win\n"
+		exit
+	fi
+}
+
 # FUNCTION FOR GAME BETWEEN PLAYER AND COMPUTER
 function playerVsComputer()
 {
-	# REPEAT UNTIL THE CELL COUNT REACHES 8 (0 TO 8)
-	while [[ $count -le 8 ]]
+	while [[ $count -le 8 ]]	# REPEAT UNTIL THE CELL COUNT REACHES 8 (0 TO 8)
 	do
-		# CONDITION FOR PLAYER TO PLAY WHEN WON THE TOSS
 		if [[ $nextTurn == "true" ]]
 		then
-			read -p "Enter Cell position number: " cellPosition
-			positionSelect $playerLetter $cellPosition
-			nextTurn="false"
-			if [[ $result == "win" ]]
-			then
-				printf "player win\n"
-				exit
-			fi
+			playerPlay
 		fi
-		# CONDITION FOR COMPUTER TO PLAY WHEN WON THE TOSS
 		if [[ $nextTurn == "false" ]]
 		then
-			computerPosition=$(($RANDOM%9))
-			positionSelect $computerLetter $computerPosition
-			nextTurn="true"
-			if [[ $result == "win" ]]
-			then
-				printf "computer win\n"
-				exit
-			fi
+			computerPlay
 		fi
 	done
 }
@@ -160,7 +167,7 @@ function positionSelect () {
 			printf "draw\n"
 			exit
 		else
-			if [[ $result -ne "win" || $result -ne "draw" ]]
+			if [[ $result -eq "win" || $result -eq "draw" ]]
 			then
 				printf "change turn\n"
 			fi
